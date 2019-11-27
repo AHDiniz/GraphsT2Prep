@@ -21,7 +21,7 @@ inline bool compareSetArrays(const T *a, const int ac, const T *b, const int bc)
 }
 
 template<typename T>
-inline void mergeSetArrays(const T *a, const int &ac, const T *b, const int &bc)
+inline void mergeSetArrays(T *a, int &ac, const T *b, const int &bc)
 {
 	for (int i = 0; i < bc; ++i)
 	{

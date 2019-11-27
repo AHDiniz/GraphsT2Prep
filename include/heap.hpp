@@ -23,7 +23,7 @@ public:
 	using CompareFnc = std::function<int(const T&, const T&)>&; 
 	Heap(int num, CompareFnc compare) : count(0), max(num), compare(compare)
 	{
-		items = malloc(sizeof(T) * (num + 1));
+		items = (T *)malloc(sizeof(T) * (num + 1));
 	}
 
 	~Heap()
@@ -43,8 +43,9 @@ public:
 
 	T pop(void)
 	{
-		if (count - 1 < 0) return nullptr;
+		if (count - 1 < 0) return items[0];
 		--count;
+		T result = items[1];
 		exch(items[1], items[count + 1]);
 		FixDown(1);
 		return result;
