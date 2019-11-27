@@ -2,6 +2,8 @@
 #include "heap.hpp"
 #include "kruskal.hpp"
 
+#include <iostream>
+
 KruskalGraph::KruskalGraph(int n, int m) : Graph(n, m), count(0)
 {
 	edges.starts = (int *)malloc(sizeof(int) * m);
@@ -59,6 +61,7 @@ const Graph::edge *KruskalGraph::mst(void)
 		int u = start(e), v = end(e);
 		if (!compareSetArrays(&sets[u * n + 1], sets[u * n], &sets[v * n + 1], sets[v * n]))
 		{
+			std::cout << e << std::endl;
 			result[count] = e;
 			++count;
 			mergeSetArrays(&sets[u * n + 1], sets[u * n], &sets[v * n + 1], sets[v * n]);
