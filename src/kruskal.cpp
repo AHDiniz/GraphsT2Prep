@@ -1,4 +1,4 @@
-#include "utils.hpp"
+#include "set.hpp"
 #include "heap.hpp"
 #include "kruskal.hpp"
 
@@ -22,13 +22,16 @@ KruskalGraph::~KruskalGraph()
 int KruskalGraph::compareEdges(edge &a, edge &b)
 {
 	if (weight(a) == weight(b)) return 0;
-	else (weight(a) > weight(b)) ? 1 : -1;
+	else return (weight(a) > weight(b)) ? 1 : -1;
 }
 
 const int *KruskalGraph::get(edge e)
 {
-	const int result[3] = { start(e), end(e), weight(e) };
-	return result;
+	int *result = (int *)malloc(sizeof(int) * 3);
+	result[0] = start(e);
+	result[1] = end(e);
+	result[2] = weight(e);
+	return const_cast<const int *>(result);
 }
 
 Graph::edge KruskalGraph::set(int n, int m, int c)
@@ -42,16 +45,17 @@ Graph::edge KruskalGraph::set(int n, int m, int c)
 const Graph::edge *KruskalGraph::mst(void)
 {
 	edge *result = (edge *)malloc(sizeof(edge) * (n - 1));
-	int *sets = (int *)malloc(sizeof(int) * n * n);
-	for (int i = 0; i < n * n; ++i) sets[i] = 0;
 
-	std::function<int(const edge&, const edge&)> func =
-	[this](const edge &u, const edge &v) {
-		if (weight(u) == weight(v)) return 0;
-		else (weight(u) > weight(v)) ? 1 : -1;
-	};
+	Set<edge> *sets = (Set<edge> *)alloca(sizeof(Set<edge>) * n);
+	for (int i = 0; i < n; ++i)
+	{
+		sets[i].init(n);
+		sets[i].add(i);
+	}
 
-	Heap<edge> heap(m, func);
+	Heap<edge> heap(m, [this](const edge &u) {
+		return weight(u);
+	});
 	for (int i = 0; i < m; ++i) heap.add(i);
 
 	int count = 0;
@@ -59,14 +63,14 @@ const Graph::edge *KruskalGraph::mst(void)
 	{
 		edge e = heap.pop();
 		int u = start(e), v = end(e);
-		if (!compareSetArrays(&sets[u * n + 1], sets[u * n], &sets[v * n + 1], sets[v * n]))
+		if (!(sets[u] == sets[v]))
 		{
-			std::cout << e << std::endl;
-			result[count] = e;
-			++count;
-			mergeSetArrays(&sets[u * n + 1], sets[u * n], &sets[v * n + 1], sets[v * n]);
+			result[count++] = e;
+			sets[u] += sets[v];
 		}
 	}
+
+	for (int i = 0; i < n; ++i) sets[i].~Set();
 
 	return result;
 }

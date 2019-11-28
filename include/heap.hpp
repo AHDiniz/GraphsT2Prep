@@ -1,6 +1,10 @@
-#pragma once
+#ifndef HEAP_H_
 
+#define HEAP_H_
+
+#include <cmath>
 #include <cstdlib>
+#include <iostream>
 #include <functional>
 
 template<typename T>
@@ -20,8 +24,8 @@ public:
 	 * 0  -> both are equaly importante
 	 * -1 -> second is more important
 	*/
-	using CompareFnc = std::function<int(const T&, const T&)>&; 
-	Heap(int num, CompareFnc compare) : count(0), max(num), compare(compare)
+	using PriorityFnc = std::function<int(const T&)>; 
+	Heap(int num, PriorityFnc priority) : count(0), max(num), priority(priority)
 	{
 		items = (T *)malloc(sizeof(T) * (num + 1));
 	}
@@ -35,20 +39,46 @@ public:
 
 	bool add(T item)
 	{
-		if (count + 1 > max) return false;
 		int top = ++count;
+		if (top > max)
+		{
+			count--;
+			return false;
+		}
 		items[top] = item;
 		FixUp(top);
+		return true;
 	}
 
 	T pop(void)
 	{
+		print();
+
 		if (count - 1 < 0) return items[0];
 		--count;
 		T result = items[1];
 		exch(items[1], items[count + 1]);
 		FixDown(1);
+
+		print();
+
 		return result;
+	}
+
+	void print(void)
+	{
+		std::cout << "Heap: (count = " << count << ")" << std::endl;
+		int level = 0;
+		for (int i = 1; i <= count; ++i)
+		{
+			if (i == pow(2, level + 1))
+			{
+				++level;
+				std::cout << std::endl;
+			}
+			std::cout << "(" << items[i] << ", " << priority(items[i]) << ") ";
+		}
+		std::cout << std::endl;
 	}
 
 	inline T &peek(void) { return items[1]; }
@@ -60,7 +90,7 @@ public:
 private:
 	void FixUp(int pos)
 	{
-		while (pos > 1 && compare(items[pos / 2], items[pos]) == 1)
+		while (pos > 1 && priority(items[pos / 2]) > priority(items[pos]))
 		{
 			exch(items[pos / 2], items[pos]);
 			pos /= 2;
@@ -72,8 +102,8 @@ private:
 		while (2 * pos < count)
 		{
 			int j = 2 * pos;
-			if (j < count && compare(items[j], items[j + 1]) == 1) ++j;
-			if (compare(items[pos], items[j]) == 1 || compare(items[pos], items[j]) == 0) break;
+			if (j < count && priority(items[j]) > priority(items[j + 1])) ++j;
+			if (priority(items[pos]) <= priority(items[j])) break;
 			exch(items[pos], items[j]);
 			pos = j;
 		}
@@ -83,5 +113,7 @@ private:
 	int count;
 	int max;
 
-	CompareFnc compare;
+	PriorityFnc priority;
 };
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GRAPH_H_
+
+#define GRAPH_H_
 
 class Graph
 {
@@ -21,3 +23,5 @@ protected:
 	virtual int compareEdges(edge &a, edge &b) = 0;
 	int n, m;
 };
+
+#endif

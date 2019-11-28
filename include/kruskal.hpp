@@ -1,4 +1,6 @@
-#pragma once
+#ifndef KRUSKAL_H_
+
+#define KRUSKAL_H_
 
 #include "graph.hpp"
 
@@ -30,3 +32,5 @@ private:
     EdgeData edges;
     int count;
 };
+
+#endif
