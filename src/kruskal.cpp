@@ -1,4 +1,4 @@
-#include "set.hpp"
+#include "unionfind.hpp"
 #include "heap.hpp"
 #include "kruskal.hpp"
 
@@ -46,12 +46,7 @@ const Graph::edge *KruskalGraph::mst(void)
 {
 	edge *result = (edge *)malloc(sizeof(edge) * (n - 1));
 
-	Set<edge> *sets = (Set<edge> *)alloca(sizeof(Set<edge>) * n);
-	for (int i = 0; i < n; ++i)
-	{
-		sets[i].init(n);
-		sets[i].add(i);
-	}
+	UnionFind uf(n);
 
 	Heap<edge> heap(m, [this](const edge &u) {
 		return weight(u);
@@ -63,14 +58,12 @@ const Graph::edge *KruskalGraph::mst(void)
 	{
 		edge e = heap.pop();
 		int u = start(e), v = end(e);
-		if (!(sets[u] == sets[v]))
+		if (uf.find(u) != uf.find(v))
 		{
 			result[count++] = e;
-			sets[u] += sets[v];
+			uf.connect(u, v);
 		}
 	}
-
-	for (int i = 0; i < n; ++i) sets[i].~Set();
 
 	return result;
 }
