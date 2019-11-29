@@ -60,7 +60,8 @@ const Graph::edge *KruskalGraph::mst(void)
 		int u = start(e), v = end(e);
 		if (uf.find(u) != uf.find(v))
 		{
-			result[count++] = e;
+			result[count] = e;
+			++count;
 			uf.connect(u, v);
 		}
 	}
